@@ -9,6 +9,8 @@ reports which you have to configure (or find out which pre-configured report is 
 important financial data (net worth, profit) is constantly up-to-date and "in your face". This
 allows you to constantly make informed decision rather than doing so periodically.
 
+The Cocoa UI of moneyGuru is hosted in a separate repo: https://github.com/hsoft/moneyguru-cocoa
+
 # Current status: People wanted
 
 moneyGuru has currently only one maintainer, me. This is a dangerous situation that needs to be
@@ -41,7 +43,6 @@ This package contains the source for moneyGuru. Its documentation is
 [available online][documentation]. Here's how this source tree is organised:
 
 * core: Contains the core logic code for moneyGuru. It's Python code.
-* cocoa: UI code for the Cocoa toolkit. It's Objective-C code.
 * qt: UI code for the Qt toolkit. It's written in Python and uses PyQt.
 * images: Images used by the different UI codebases.
 * debian: Skeleton files required to create a .deb package.
@@ -49,34 +50,17 @@ This package contains the source for moneyGuru. Its documentation is
 * locale: .po files for localisation.
 
 There are also other sub-folder that comes from external repositories and are part of this repo as
-git subtrees:
+git submodules:
 
 * hscommon: A collection of helpers used across HS applications.
-* cocoalib: A collection of helpers used across Cocoa UI codebases of HS applications.
 * qtlib: A collection of helpers used across Qt UI codebases of HS applications.
-* ambuttonbar: Cocoa library to display filter buttons.
-* psmtabbarcontrol: Cocoa library for tabs.
 
 # How to build moneyGuru from source
 
-## The very, very, very easy way
+### Prerequisites
 
-If you're on Linux or Mac, there's a bootstrap script that will make building very, very easy. There
-might be some things that you need to install manually on your system, but the bootstrap script will
-tell you when what you need to install. You can run the bootstrap with:
-
-    ./bootstrap.sh
-
-and follow instructions from the script. You can then ignore the rest of the build documentation.
-
-## Prerequisites installation
-
-Then, you have to make sure that your system has its "non-pip-installable" prerequisites installed:
-
-* All systems: [Python 3.4+][python]
-* Mac OS X: 10.7+ with XCode command line tools and a "framework enabled" Python (see below)
-* Windows: Visual Studio 2010, [PyQt 5.4+][pyqt], [cx_Freeze][cxfreeze] and
-  [Advanced Installer][advinst] (you only need the last two if you want to create an installer)
+* [Python 3.4+][python]
+* PyQt5
 
 On Ubuntu, the apt-get command to install all pre-requisites is:
 
@@ -91,27 +75,12 @@ pyenv in installed, run a command like:
 
     env PYTHON_CONFIGURE_OPTS="--enable-framework" pyenv install 3.5.1
 
-## Setting up the virtual environment
+### make
 
-Use Python's built-in `pyvenv` to create a virtual environment in which we're going to install our
-Python-related dependencies.
+moneyGuru is built with "make":
 
-    $ pyvenv --system-site-packages env
-    $ source env/bin/activate
-    $ pip install -r requirements-[osx|win].txt
-
-([osx|win] depends, of course, on your platform. On other platforms, just use requirements.txt).
-
-## Actual building and running
-
-With your virtualenv activated, you can build and run moneyGuru with these commands:
-
-    $ python build.py
-    $ python run.py
-
-You can also package moneyGuru into an installable package with:
-    
-    $ python package.py
+    $ make
+    $ make run
 
 # Running tests
 
@@ -138,8 +107,6 @@ and is also [available online][documentation].
 [python]: http://www.python.org/
 [pyenv]: https://github.com/yyuu/pyenv
 [pyqt]: http://www.riverbankcomputing.com
-[cxfreeze]: http://cx-freeze.sourceforge.net/
-[advinst]: http://www.advancedinstaller.com
 [sphinx]: http://sphinx.pocoo.org/
 [tox]: https://tox.readthedocs.org/en/latest/
 

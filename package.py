@@ -1,6 +1,4 @@
-# Created By: Virgil Dupras
-# Created On: 2009-12-30
-# Copyright 2015 Hardcoded Software (http://www.hardcoded.net)
+# Copyright 2017 Virgil Dupras
 #
 # This software is licensed under the "GPLv3" License as described in the "LICENSE" file,
 # which should be included with this package. The terms are also available at
@@ -15,11 +13,10 @@ import platform
 import venv
 
 from core.app import Application as MoneyGuru
-from hscommon.plat import ISWINDOWS, ISLINUX, ISOSX
+from hscommon.plat import ISWINDOWS, ISLINUX
 from hscommon.build import (
     copy_packages, build_debian_changelog, copy_qt_plugins, print_and_do,
-    move, copy_all, setup_package_argparser, package_cocoa_app_in_dmg,
-    find_in_path
+    move, copy_all, setup_package_argparser, find_in_path
 )
 
 def parse_args():
@@ -141,31 +138,27 @@ def package_source_tgz():
 
 def main():
     args = parse_args()
-    ui = 'cocoa' if ISOSX else 'qt'
     if args.src_pkg:
         print("Creating source package for moneyGuru")
         package_source_tgz()
         return
-    print("Packaging moneyGuru with UI {0}".format(ui))
-    if ui == 'cocoa':
-        package_cocoa_app_in_dmg('build/moneyGuru.app', '.', args)
-    elif ui == 'qt':
-        if ISWINDOWS:
-            package_windows()
-        elif ISLINUX:
-            if not args.arch_pkg:
-                distname, _, _ = platform.dist()
-            else:
-                distname = 'arch'
-            if distname == 'arch':
-                package_arch()
-            else:
-                print("Packaging for Ubuntu")
-                # We only support LTS releases
-                for distribution in ['trusty', 'xenial']:
-                    package_debian(distribution)
+    print("Packaging moneyGuru")
+    if ISWINDOWS:
+        package_windows()
+    elif ISLINUX:
+        if not args.arch_pkg:
+            distname, _, _ = platform.dist()
         else:
-            print("Qt packaging only works under Windows or Linux.")
+            distname = 'arch'
+        if distname == 'arch':
+            package_arch()
+        else:
+            print("Packaging for Ubuntu")
+            # We only support LTS releases
+            for distribution in ['trusty', 'xenial']:
+                package_debian(distribution)
+    else:
+        print("Qt packaging only works under Windows or Linux.")
 
 if __name__ == '__main__':
     main()

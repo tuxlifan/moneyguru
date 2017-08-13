@@ -1,19 +1,11 @@
-.DS_Store
 *.so
 *.mo
-*.dmg
-*.back.aip
 __pycache__
 build
 env
 _build
 .tox
 /conf.json
-/cocoa/Info.plist
-/cocoa/build
-/cocoa/autogen
-/cocoa/.waf*
-/cocoa/.lock-waf*
 
 /qt/*_rc.py
 /qt/ui/*_ui.py
@@ -22,7 +14,6 @@ dist
 install
 installer_tmp-cache
 deps
-/run.py
 /help/*/conf.py
 /help/*/changelog.rst
 /help/*/credits.rst
