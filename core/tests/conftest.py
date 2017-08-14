@@ -1,6 +1,4 @@
-# Created By: Virgil Dupras
-# Created On: 2010-07-11
-# Copyright 2015 Hardcoded Software (http://www.hardcoded.net)
+# Copyright 2017 Virgil Dupras
 #
 # This software is licensed under the "GPLv3" License as described in the "LICENSE" file,
 # which should be included with this package. The terms are also available at
@@ -10,14 +8,29 @@
 
 import os
 import time
-import py
+import pytest
 
-from hscommon.testutil import pytest_funcarg__app
+from hscommon.testutil import pytest_funcarg__app # noqa
 
 from ..model.currency import RatesDB, Currency
 from ..model import currency as currency_module
 
 global_monkeypatch = None
+
+def pytest_addoption(parser):
+    parser.addoption(
+        "--run-network", action="store_true",
+        default=False, help="run tests that need network"
+    )
+
+def pytest_collection_modifyitems(config, items):
+    if config.getoption("--run-network"):
+        # --run-network given in cli: do not skip slow tests
+        return
+    skip_network = pytest.mark.skip(reason="need --run-network option to run")
+    for item in items:
+        if "needs_network" in item.keywords:
+            item.add_marker(skip_network)
 
 def pytest_configure(config):
     def fake_initialize_db(path):
