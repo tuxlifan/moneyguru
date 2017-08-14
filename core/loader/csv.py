@@ -1,6 +1,4 @@
-# Created By: Virgil Dupras
-# Created On: 2009-01-18
-# Copyright 2015 Hardcoded Software (http://www.hardcoded.net)
+# Copyright 2017 Virgil Dupras
 #
 # This software is licensed under the "GPLv3" License as described in the "LICENSE" file,
 # which should be included with this package. The terms are also available at
@@ -30,14 +28,14 @@ class CsvField:
 MERGABLE_FIELDS = {CsvField.Description, CsvField.Payee}
 
 class Loader(base.Loader):
-    FILE_ENCODING = 'latin-1'
+    FILE_OPEN_MODE = 'rb'
 
     def __init__(self, default_currency, default_date_format=None):
         base.Loader.__init__(self, default_currency, default_date_format)
         self.columns = []
         self.lines = []
         self.dialect = None # last used dialect
-        self.rawlines = [] # last prepared file
+        self.readcontent = b''
 
     # --- Private
     @staticmethod
@@ -60,11 +58,11 @@ class Loader(base.Loader):
 
     def _prepare(self, infile):
         # Comment lines can confuse the sniffer. We remove them
-        content = infile.read()
-        content = content.replace('\0', '')
+        readcontent = infile.read()
+        content = readcontent.replace(b'\0', b'').decode('latin-1')
         lines = content.split('\n')
         stripped_lines = [line.strip() for line in lines]
-        stripped_lines = [line for line in lines if line and not line.startswith('#')]
+        stripped_lines = [line for line in stripped_lines if line and not line.startswith('#')]
         try:
             self.dialect = csv.Sniffer().sniff('\n'.join(stripped_lines))
         except csv.Error:
@@ -83,15 +81,13 @@ class Loader(base.Loader):
             class ManualDialect(csv.excel):
                 delimiter = delim
             self.dialect = ManualDialect
-        self.rawlines = lines
+        self.readcontent = readcontent
 
     def _scan_lines(self, encoding=None):
-        rawlines = self.rawlines
-        if encoding and encoding != self.FILE_ENCODING:
-            # rawlines is a list of ustrings decoded using latin-1, so if we want to re-decode them
-            # using another encoding, we have to re-encode them and the decode them using our encoding
-            redecode = lambda s: s.encode(self.FILE_ENCODING).decode(encoding, 'ignore')
-            rawlines = (redecode(line) for line in rawlines)
+        if not encoding:
+            encoding = 'latin-1'
+        content = self.readcontent.decode(encoding, 'ignore').replace('\0', '')
+        rawlines = content.splitlines()
         try:
             reader = csv.reader(iter(rawlines), self.dialect)
         except TypeError:

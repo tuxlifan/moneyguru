@@ -1,9 +1,7 @@
-# Created By: Virgil Dupras
-# Created On: 2009-01-18
-# Copyright 2015 Hardcoded Software (http://www.hardcoded.net)
-# 
-# This software is licensed under the "GPLv3" License as described in the "LICENSE" file, 
-# which should be included with this package. The terms are also available at 
+# Copyright 2017 Virgil Dupras
+#
+# This software is licensed under the "GPLv3" License as described in the "LICENSE" file,
+# which should be included with this package. The terms are also available at
 # http://www.gnu.org/licenses/gpl-3.0.html
 
 from hscommon.testutil import eq_
@@ -402,7 +400,7 @@ class TestImportFortisThenAnotherWithLessColumns:
         app.csvopt.set_column_field(6, CsvField.Transfer) # out of range of the other
         app.mw.parse_file_for_import(testdata.filepath('csv/increase_decrease.csv')) # less columns (3)
         return app
-    
+
     @with_app(do_setup)
     def test_access_last_column(self, app):
         # the columns are supposed to have been *reduced* so the gui doesn't try to access data that
@@ -411,7 +409,7 @@ class TestImportFortisThenAnotherWithLessColumns:
             app.csvopt.lines[0][len(app.csvopt.columns) - 1]
         except IndexError:
             assert False, "The number of columns should not be higher than what the lines contain"
-    
+
     @with_app(do_setup)
     def test_select_fortis_layout_then_reload(self, app):
         # simply accessing a layout while having a csv with few columns loaded should not remove
@@ -420,7 +418,7 @@ class TestImportFortisThenAnotherWithLessColumns:
         app.mw.parse_file_for_import(testdata.filepath('csv/fortis.csv'))
         app.csvopt.select_layout('fortis')
         eq_(app.csvopt.columns[6], CsvField.Transfer)
-    
+
     @with_app(do_setup)
     def test_set_date_and_amount_then_import(self, app):
         # The csv loading process must not crash either, even if out-of-range columns are fed to it.
@@ -430,7 +428,7 @@ class TestImportFortisThenAnotherWithLessColumns:
         app.csvopt.set_column_field(2, CsvField.Decrease)
         app.csvopt.continue_import() # no crash
         eq_(len(app.itable), 3)
-    
+
 
 # ---
 class TestIncreaseDecrease:
@@ -444,7 +442,7 @@ class TestIncreaseDecrease:
         app.csvopt.set_column_field(2, CsvField.Decrease)
         app.csvopt.set_line_excluded(0, True)
         return app
-    
+
     @with_app(do_setup)
     def test_continue_import(self, app):
         app.csvopt.continue_import()
@@ -452,7 +450,7 @@ class TestIncreaseDecrease:
         eq_(app.itable[0].amount_import, '10.00')
         eq_(app.itable[1].amount_import, '-10.00')
         eq_(app.itable[2].amount_import, '-10.00')
-    
+
 
 # ---
 class TestWeirdSep:
@@ -463,39 +461,39 @@ class TestWeirdSep:
         app = TestApp()
         app.mw.parse_file_for_import(testdata.filepath('csv/weird_sep.csv'))
         return app
-    
+
     @with_app(do_setup)
     def test_field_separator(self, app):
         # the field_separator member contains the currently used field sep.
         eq_(app.csvopt.field_separator, ',')
-    
+
     @with_app(do_setup)
     def test_rescan(self, app):
         # It's possible to specify a new field sep and then rescan the csv.
         app.csvopt.field_separator = ';'
         app.csvopt.rescan()
         eq_(app.csvopt.lines[0], ['foo,bar', 'foo,baz'])
-    
+
     @with_app(do_setup)
     def test_set_long_separator(self, app):
         # csv dialect requires a char of 1 in length. If the input is bigger, just use the first char
         app.csvopt.field_separator = ';foo'
         app.csvopt.rescan()
         eq_(app.csvopt.lines[0], ['foo,bar', 'foo,baz'])
-    
+
     @with_app(do_setup)
     def test_set_non_latin_separator(self, app):
         # a csv dialect requires a string delimiter, not a unicode one. encode unicode automatically,
         # an abort on errors.
         app.csvopt.field_separator = 'ł'
         app.csvopt.rescan() # no crash
-    
+
     @with_app(do_setup)
     def test_set_null_separator(self, app):
         # ignore attemps to set an empty separator
         app.csvopt.field_separator = ''
         app.csvopt.rescan() # no crash
-    
+
 
 # ---
 class TestAmountWithDollarSign:
@@ -506,14 +504,14 @@ class TestAmountWithDollarSign:
         app.csvopt.set_column_field(0, CsvField.Date)
         app.csvopt.set_column_field(1, CsvField.Amount)
         return app
-    
+
     @with_app(do_setup)
     def test_import(self, app):
         # No crash and the correct amounts are parsed
         app.csvopt.continue_import() # no crash
         eq_(app.itable[0].amount_import, '10.00')
         eq_(app.itable[1].amount_import, '-42.00')
-    
+
 
 # ---
 class TestShortDates:
@@ -524,14 +522,14 @@ class TestShortDates:
         app.csvopt.set_column_field(0, CsvField.Date)
         app.csvopt.set_column_field(1, CsvField.Amount)
         return app
-    
+
     @with_app(do_setup)
     def test_import(self, app):
         # No crash and the correct amounts are parsed
         app.csvopt.continue_import() # no crash
         eq_(app.itable[0].date_import, '04/01/2010')
         eq_(app.itable[1].date_import, '29/01/2010')
-    
+
 
 # ---
 class TestUtf8Encoded:
@@ -542,7 +540,7 @@ class TestUtf8Encoded:
         # At this point, the CSV file is parsed with latin-1 encoding, it's normal. The user is
         # supposed to select the utf-8 encoding and click Rescan.
         return app
-    
+
     @with_app(do_setup)
     def test_rescan_with_utf8_encoding(self, app):
         # Selecting the utf-8 encoding and clicking rescan re-opens the file with the correct
@@ -551,7 +549,26 @@ class TestUtf8Encoded:
         app.csvopt.rescan()
         eq_(app.csvopt.lines[1][1], 'fôø')
         eq_(app.csvopt.lines[2][1], 'bàr')
-    
+
+# ---
+class TestUtf16Encoded:
+    def do_setup(self):
+        # This file has utf16-encoded non-ascii descriptions
+        app = TestApp()
+        app.mw.parse_file_for_import(testdata.filepath('csv/utf16_encoded.csv'))
+        # At this point, the CSV file is parsed with latin-1 encoding, it's normal. The user is
+        # supposed to select the utf-16 encoding and click Rescan.
+        return app
+
+    @with_app(do_setup)
+    def test_rescan_with_utf16_encoding(self, app):
+        # Selecting the utf-16 encoding and clicking rescan re-opens the file with the correct
+        # encoding.
+        app.csvopt.encoding_index = 2
+        app.csvopt.rescan()
+        eq_(app.csvopt.lines[1][1], 'fôø')
+        eq_(app.csvopt.lines[2][1], 'bàr')
+
 # ---
 def app_simple_csv():
     app = TestApp()
