@@ -65,7 +65,9 @@ ifndef NO_VENV
 endif
 
 build/help : | env
+ifndef NO_VENV
 	$(VENV_PYTHON) -m pip install -r requirements-docs.txt
+endif
 	$(VENV_PYTHON) build.py --doc
 
 qt/mg_rc.py : qt/mg.qrc
