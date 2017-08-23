@@ -66,7 +66,11 @@ class MoneyGuru(ApplicationBase):
         self.aboutBox.show()
 
     def showHelp(self):
-        url = QUrl.fromLocalFile(op.abspath(op.join(HELP_PATH, 'index.html')))
+        help_path = op.abspath(op.join(HELP_PATH, 'index.html'))
+        if op.exists(help_path):
+            url = QUrl.fromLocalFile(help_path)
+        else:
+            url = QUrl("https://www.hardcoded.net/moneyguru/help/en")
         QDesktopServices.openUrl(url)
 
     def showPreferences(self):
