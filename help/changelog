@@ -1,3 +1,18 @@
+=== 2.11.0 (2017-08-23)
+
+* Avoid duplicate logging to both stderr and NSLog. [cocoa] (#476)
+* Improve build process on Mac OS. [cocoa] (#474)
+* Fixed year handling in macOS date formats. [cocoa] (#477)
+* Fixed currency fetching for ranges greater than 30 days. (#479)
+* Add an option to enter date elements from left to right instead of the
+  default d -> m -> y order. (#480)
+* Fix crash during pane drag & drop. [qt]
+* Fix Bank of Canada currency fetching. It was broken.
+* Fix quirks with edition mode during transaction addition. [qt]
+* Add UTF-16 support to CSV imports. (#486)
+* Improve autofill by allowing it to autofill more often.
+* Improve build process.
+
 === 2.10.2 (2016-08-28)
 
 * Fix crash when opening panels on some versions of PyQt. [qt] (#456)
