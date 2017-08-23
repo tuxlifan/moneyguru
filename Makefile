@@ -101,7 +101,7 @@ install: all pyc
 	mkdir -p ${DESTDIR}${PREFIX}/bin
 	ln -sf ${PREFIX}/share/moneyguru/run.py ${DESTDIR}${PREFIX}/bin/moneyguru
 	mkdir -p ${DESTDIR}${PREFIX}/share/applications
-	cp -f pkg/moneyguru.desktop ${DESTDIR}${PREFIX}/share/applications
+	cp -f debian/moneyguru.desktop ${DESTDIR}${PREFIX}/share/applications
 	mkdir -p ${DESTDIR}${PREFIX}/share/pixmaps
 	cp -f images/logo_big.png ${DESTDIR}${PREFIX}/share/pixmaps/moneyguru.png
 
