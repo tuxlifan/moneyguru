@@ -104,9 +104,17 @@ class Row(RowBase):
                 break
 
     def _autofill_row(self, ref_row, dest_attrs):
+        previous_autofilled_values = getattr(self, '_previous_autofilled_values', {})
+        new_autofilled_values = {}
         for attrname in dest_attrs:
-            if not getattr(self, attrname):
-                setattr(self, attrname, getattr(ref_row, attrname))
+            val = getattr(self, attrname)
+            # We autofill a field in two cases: the field is empty or it has the same value as when
+            # it was autofilled.
+            if not val or val == previous_autofilled_values.get(attrname):
+                newval = getattr(ref_row, attrname)
+                setattr(self, attrname, newval)
+                new_autofilled_values[attrname] = newval
+        self._previous_autofilled_values = new_autofilled_values
 
     def _get_autofill_attrs(self):
         raise NotImplementedError()

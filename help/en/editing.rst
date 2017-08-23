@@ -109,11 +109,33 @@ Fields allowing you to enter amounts have a few hidden features.
 Auto-completion, Autofill and Lookups
 -------------------------------------
 
-moneyGuru has advanced auto-completion and autofill capabilities. As soon as you type something in an auto-completable field (Description, Payee, Account), moneyGuru will look in other transactions you have and give you a completion proposition. You can cycle through the propositions with the up and down arrows. To accept a proposition, just tab out. You can also, of course, just continue to type.
+moneyGuru has advanced auto-completion and autofill capabilities. As soon as
+you type something in an auto-completable field (Description, Payee, Account),
+moneyGuru will look in other transactions you have and give you a completion
+proposition. You can cycle through the propositions with the up and down
+arrows. To accept a proposition, just tab out. You can also, of course, just
+continue to type.
 
-The autofill feature will automatically fill empty fields after you tab out of an auto-completable field. For example, if Payee is the first auto-completable column, typing an existing payee will make all subsequent fields automatically filled with values from the last transaction containing that payee.
+The autofill feature will automatically fill empty fields after you tab out of
+an auto-completable field. For example, if Payee is the first auto-completable
+column, typing an existing payee will make all subsequent fields automatically
+filled with values from the last transaction containing that payee.
 
-Under Mac OS X, it's possible to summon a lookup list for any auto-completable field. You need to type a payee that you **know** you have somewhere in your transaction, but don't remember what it starts with? Press |cmd|\ L and a lookup dialog will appear, listing all your payees. The search field allows you to run a fuzzy search (which means that you don't have to type the beginning of your payee, just a few letters that are in it) that will make most relevant payees come first in the list.
+The autofill feature considers previously autofilled values as empty values.
+For example, if you trigger an autofill in Payee and Transfer by filling
+Description, you will also trigger an autofill on Transfer by editing Payee,
+even if the field is not empty.
+
+Another way of saying it is that autofill will only fill fields that you
+haven't explicitly typed *yourself*.
+
+Under Mac OS X, it's possible to summon a lookup list for any auto-completable
+field. You need to type a payee that you **know** you have somewhere in your
+transaction, but don't remember what it starts with? Press |cmd|\ L and a
+lookup dialog will appear, listing all your payees. The search field allows you
+to run a fuzzy search (which means that you don't have to type the beginning of
+your payee, just a few letters that are in it) that will make most relevant
+payees come first in the list.
 
 .. |edition_buttons| image:: image/edition_buttons.png
 .. |edition_account_panel| image:: image/edition_account_panel.png

@@ -911,6 +911,25 @@ def test_autofill_doesnt_overwrite_nonblank_fields(app):
     eq_(row.description, 'foo')
 
 @with_app(app_autofill)
+def test_autofill_fills_nonblank_autofilled_fields(app):
+    # Even though we don't touch nonblank fields, if that field was filled through autofilling, we
+    # *do* overwrite it.
+    app.add_entry('10/10/2007', 'foo', payee='bar', transfer='baz', increase='43')
+    app.ttable.add()
+    row = app.ttable.edited
+    row.description = 'Deposit' # Sets all other fields according to the first txn
+    row.payee = 'bar' # Set all fields to the *right* of payee according to the 2nd txn!
+    eq_(row.from_, 'baz')
+    eq_(row.amount, '43.00')
+
+    # But! don't consider the value "autofilled" once the row is saved!
+    app.ttable.save_edits()
+    row = app.ttable[1]
+    row.payee = 'Payee' # Don't autofill anything! All fields are already filled!
+    eq_(row.from_, 'baz')
+    eq_(row.amount, '43.00')
+
+@with_app(app_autofill)
 def test_autofill_is_case_sensitive(app):
     # When the case of a description/transfer value does not match an entry, completion do not occur.
     app.ttable.add()
