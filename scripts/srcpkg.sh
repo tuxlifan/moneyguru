@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "Creating git archive"
-version=`python -c "from core.app import Application; print(Application.VERSION)"`
+version=`python3 -c "from core.app import Application; print(Application.VERSION)"`
 dest="moneyguru-src-${version}.tar"
 
 git archive -o ${dest} HEAD

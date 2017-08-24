@@ -5,6 +5,7 @@ PREFIX ?= /usr/local
 # Set this variable if all dependencies are already met on the system. We will then avoid the
 # whole vitualenv creation and pip install dance.
 NO_VENV ?=
+UBUNTU_VERSION ?= xenial
 
 ifdef NO_VENV
 	VENV_PYTHON = $(PYTHON)
@@ -93,6 +94,10 @@ normpo :
 srcpkg :
 	./scripts/srcpkg.sh
 
+debsrc:
+	./scripts/debian_changelog.py $(UBUNTU_VERSION)
+	dpkg-buildpackage -S
+	
 install: all pyc
 	mkdir -p ${DESTDIR}${PREFIX}/share/moneyguru
 	cp -rf ${packages} locale ${DESTDIR}${PREFIX}/share/moneyguru
