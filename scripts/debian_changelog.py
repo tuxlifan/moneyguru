@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 
 import sys
-sys.path.insert(0, '')
-from hscommon.build import build_debian_changelog
+sys.path.insert(0, '') # noqa
+
+from hscommon.build import build_debian_changelog # noqa
+
 
 try:
     distro = sys.argv[1]
