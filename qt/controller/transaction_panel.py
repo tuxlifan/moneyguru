@@ -6,11 +6,12 @@
 # which should be included with this package. The terms are also available at
 # http://www.gnu.org/licenses/gpl-3.0.html
 
-from PyQt5.QtCore import Qt, QSize
-from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtCore import Qt, QSize, pyqtSlot
+from PyQt5.QtGui import QIcon, QPixmap, QKeySequence
 from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QFormLayout, QTabWidget, QLabel, QLineEdit, QPlainTextEdit,
-    QAbstractItemView, QSizePolicy, QSpacerItem, QPushButton, QDialogButtonBox
+    QAbstractItemView, QSizePolicy, QSpacerItem, QPushButton, QDialogButtonBox,
+    QShortcut
 )
 
 from hscommon.trans import trget
@@ -47,6 +48,10 @@ class TransactionPanel(Panel):
         self.addSplitButton.clicked.connect(self.splitTable.model.add)
         self.removeSplitButton.clicked.connect(self.splitTable.model.delete)
 
+    @pyqtSlot()
+    def on_focus_transactions(self):
+        self.splitTableView.setFocus()
+
     def _setupUi(self):
         self.setWindowTitle(tr("Transaction Info"))
         self.resize(462, 329)
@@ -80,6 +85,8 @@ class TransactionPanel(Panel):
         self.splitTableView.horizontalHeader().setDefaultSectionSize(40)
         self.splitTableView.verticalHeader().setVisible(False)
         self.splitTableView.verticalHeader().setDefaultSectionSize(18)
+        self.tvShortcut = QShortcut(QKeySequence("Alt+T"), self)
+        self.tvShortcut.activated.connect(self.on_focus_transactions)
         self.infoLayout.addWidget(self.splitTableView)
         self.mctButtonsLayout = QHBoxLayout()
         self.mctButtonsLayout.setContentsMargins(0, 0, 0, 0)
@@ -110,7 +117,8 @@ class TransactionPanel(Panel):
         self.mainLayout.addWidget(self.tabWidget)
         self.buttonBox = QDialogButtonBox(self)
         self.buttonBox.setOrientation(Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Save)
+        self.buttonBox.addButton(tr("&Save"), QDialogButtonBox.AcceptRole)
+        self.buttonBox.addButton(tr("Cancel"), QDialogButtonBox.RejectRole)
         self.mainLayout.addWidget(self.buttonBox)
 
     def _loadFields(self):
