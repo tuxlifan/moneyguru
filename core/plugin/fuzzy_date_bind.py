@@ -17,6 +17,7 @@ from core.plugin import ImportBindPlugin, EntryMatch
 #       Does it influence existing_entries below? Are there older entries that don't appear?
 #
 
+
 class FuzzyDateBind(ImportBindPlugin):
     """Check for each imported txn if there is an existing txn that is within [date - DELTA_T, date + DELTA_T]
     and has at least one matching split amount.
@@ -37,19 +38,18 @@ class FuzzyDateBind(ImportBindPlugin):
         will_import = True
 
         for imported_entry in imported_entries:
-            lo = imported_entry.date - DELTA_T
-            hi = imported_entry.date + DELTA_T
+            lo = imported_entry.date - self.DELTA_T
+            hi = imported_entry.date + self.DELTA_T
             for existing_entry in existing_entries:
                 if lo <= existing_entry.date and hi >= existing_entry.date:
                     for isplit in imported_entry.splits:
                         for esplit in existing_entry.splits:
                             if isplit.amount == esplit.amount:
-                                matches.append(EntryMatch(existing_entry, imported_entry, will_import, CONFIDENCE))
+                                matches.append(EntryMatch(existing_entry, imported_entry, will_import, self.CONFIDENCE))
                                 break
-                        #-------|
+                        # ------|
                         else:
                             continue
                         break  # break on inner break to get to next existing_entry
-            #.......#---|
+            # ......#---|
         return matches
-
