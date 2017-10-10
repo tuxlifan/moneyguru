@@ -29,6 +29,17 @@ class FuzzyDateBind(ImportBindPlugin):
 
     BASE_CONFIDENCE = 0.75  # could be increased when implement memo matching / associations...
     DELTA_T = datetime.timedelta(4)  # 4 days
+    # positive key: imported is after existing
+    # (e.g. money taken from account (import) after purchase date (manual entry, existing))
+    PENALTIES = { -4: .08,  # noqa
+                  -3: .07,
+                  -2: .06,
+                  -1: .05,
+                   0: 0,
+                  +1: .01,
+                  +2: .02,
+                  +3: .03,
+                  +4: .04, }
 
     def match_entries(self,
                       target_account,
@@ -46,6 +57,7 @@ class FuzzyDateBind(ImportBindPlugin):
             if any(starmap(lambda isplit, esplit: isplit.amount == esplit.amount,
                            product(imported_entry.splits, existing_entry.splits))):
                 confidence = self.BASE_CONFIDENCE
+                confidence = self.BASE_CONFIDENCE - self.PENALTIES[(imported_entry.date - existing_entry.date).days]
                 logging.debug("Fuzzy Date Bind match ({0:1.2}): {1} {2}".format(confidence, imported_entry, existing_entry))  # noqa: E501
                 # Use "existing, imported" order according to EntryMatch definition
                 matches.append(EntryMatch(existing_entry, imported_entry, will_import, confidence))
