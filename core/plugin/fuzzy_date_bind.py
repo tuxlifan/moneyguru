@@ -56,7 +56,6 @@ class FuzzyDateBind(ImportBindPlugin):
         for imported_entry, existing_entry in entry_pairs:
             if any(starmap(lambda isplit, esplit: isplit.amount == esplit.amount,
                            product(imported_entry.splits, existing_entry.splits))):
-                confidence = self.BASE_CONFIDENCE
                 confidence = self.BASE_CONFIDENCE - self.PENALTIES[(imported_entry.date - existing_entry.date).days]
                 logging.debug("Fuzzy Date Bind match ({0:1.2}): {1} {2}".format(confidence, imported_entry, existing_entry))  # noqa: E501
                 # Use "existing, imported" order according to EntryMatch definition
