@@ -13,6 +13,7 @@ from core.plugin import ReadOnlyTablePlugin, Column
 class CurrencyRatesPlugin(ReadOnlyTablePlugin):
     NAME = 'Currency Rates'
     AUTHOR = "Virgil Dupras"
+    ENABLED_BY_DEFAULT = True
 
     # The columns that will be present in our table. For each column we add here, we have to set
     # a field value in each row we'll add in fill_table().

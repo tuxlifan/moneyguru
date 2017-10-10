@@ -24,6 +24,7 @@ from urllib.request import urlopen
 class YahooProviderPlugin(CurrencyProviderPlugin):
     NAME = 'Yahoo currency rates fetcher'
     AUTHOR = "Virgil Dupras"
+    ENABLED_BY_DEFAULT = True
 
     # First, we must tell moneyGuru what currencies we support. We have to return a list of tuples
     # containing the code, the name, the decimal precision and a fallback rate for each currencies

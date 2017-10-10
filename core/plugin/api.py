@@ -45,6 +45,8 @@ class Plugin:
     PRIORITY = 0
     #: Whether this plugin is a View, and thus should be in the plugin section of the New View tab.
     IS_VIEW = False
+    #: Whether the plugin is enabled by default. Only works with core plugins
+    ENABLED_BY_DEFAULT = False
 
     @classmethod
     def plugin_id(cls):

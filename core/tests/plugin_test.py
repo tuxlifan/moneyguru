@@ -1,4 +1,4 @@
-# Copyright 2015 Hardcoded Software (http://www.hardcoded.net)
+# Copyright 2017 Virgil Dupras
 #
 # This software is licensed under the "GPLv3" License as described in the "LICENSE" file,
 # which should be included with this package. The terms are also available at
@@ -10,6 +10,18 @@ from core.plugin import CurrencyProviderPlugin, ViewPlugin
 from ..model.currency import Currency
 from ..const import PaneType
 from .base import TestApp, with_app
+
+def find_pview_row(pview, name):
+    for row in pview.table:
+        if row.name == name:
+            return row
+    else:
+        raise AssertionError("can't find {} row".format(name))
+
+def get_plugin_list(app):
+    app.mw.select_pane_of_type(PaneType.Empty)
+    eview = app.current_view()
+    return eview.plugin_list
 
 @with_app(TestApp)
 def test_dont_crash_with_duplicate_currency_register(app):
@@ -54,32 +66,26 @@ def test_dont_crash_on_missing_appdata_path(tmpdir):
     TestApp(appargs={'appdata_path': appdata}) # no crash
 
 @with_app(TestApp)
-def test_disable_view_plugin(app):
-    # Disabling a view plugin removes it from the plugin view list. ref #451
+def test_enabled_disable_view_plugin(app):
+    # Enabling/Disabling a view plugin removes it from the plugin view list. ref #451
     app.mw.select_pane_of_type(PaneType.PluginList)
     pview = app.current_view()
-    for row in pview.table:
-        if row.name == 'Account List':
-            row.enabled = False
-            break
-    else:
-        raise AssertionError("can't find Account List row")
-    newapp = app.new_app_same_prefs()
-    newapp.mw.select_pane_of_type(PaneType.Empty)
-    eview = newapp.current_view()
-    assert 'Account List' not in eview.plugin_list
+    row = find_pview_row(pview, 'Account List')
+    assert not row.enabled
+    assert 'Account List' not in get_plugin_list(app)
+    row.enabled = True
+    assert 'Account List' in get_plugin_list(app.new_app_same_prefs())
+    row.enabled = False
+    assert 'Account List' not in get_plugin_list(app.new_app_same_prefs())
 
 @with_app(TestApp)
 def test_disable_currency_plugin(app):
     # Disabling a currency plugin makes currencies it provides unavailable. ref #451
     app.mw.select_pane_of_type(PaneType.PluginList)
     pview = app.current_view()
-    for row in pview.table:
-        if row.name == 'Stale currencies provider':
-            row.enabled = False
-            break
-    else:
-        raise AssertionError("can't find Stale currencies provider row")
+    row = find_pview_row(pview, 'Stale currencies provider')
+    assert row.enabled
+    row.enabled = False
     Currency.reset_currencies()
     newapp = app.new_app_same_prefs()
     tview = newapp.show_tview()

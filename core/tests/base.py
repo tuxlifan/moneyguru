@@ -562,6 +562,7 @@ class TestApp(TestAppBase):
         fakemod = bag()
         for index, plugin in enumerate(plugins):
             setattr(fakemod, 'plugin%d' % index, plugin)
+            plugin.ENABLED_BY_DEFAULT = True
         self.app.plugins = []
         self.app._load_plugin_module(fakemod)
         self.app._hook_currency_plugins()

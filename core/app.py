@@ -175,11 +175,11 @@ class Application(Broadcaster):
         self.saved_custom_ranges = [None] * 3
         self._load_custom_ranges()
         self.plugins = []
-        # All core plugins are enabled by default, so we keep track of *disabled* plugins instead
-        # of enabled ones.
-        self._disabled_core_plugins = set(self.get_default(PreferenceNames.DisabledCorePlugins, []))
+        # Plugins with ENABLED_BY_DEFAULT = True are implicitly enabled and must be explicitly
+        # disabled.
+        self._disabled_plugins = set(self.get_default(PreferenceNames.DisabledCorePlugins, []))
         # User plugins are disabled by default.
-        self._enabled_user_plugins = set(self.get_default(PreferenceNames.EnabledUserPlugins, []))
+        self._enabled_plugins = set(self.get_default(PreferenceNames.EnabledUserPlugins, []))
         self._load_core_plugins()
         self._load_user_plugins()
         self._hook_currency_plugins()
@@ -359,25 +359,25 @@ class Application(Broadcaster):
 
     def is_plugin_enabled(self, plugin):
         pid = plugin.plugin_id()
-        if plugin.is_core():
-            return pid not in self._disabled_core_plugins
+        if plugin.is_core() and plugin.ENABLED_BY_DEFAULT:
+            return pid not in self._disabled_plugins
         else:
-            return pid in self._enabled_user_plugins
+            return pid in self._enabled_plugins
 
     def set_plugin_enabled(self, plugin, enabled):
         pid = plugin.plugin_id()
-        if plugin.is_core():
+        if plugin.is_core() and plugin.ENABLED_BY_DEFAULT:
             if enabled:
-                self._disabled_core_plugins.discard(pid)
+                self._disabled_plugins.discard(pid)
             else:
-                self._disabled_core_plugins.add(pid)
-            self.set_default(PreferenceNames.DisabledCorePlugins, list(self._disabled_core_plugins))
+                self._disabled_plugins.add(pid)
+            self.set_default(PreferenceNames.DisabledCorePlugins, list(self._disabled_plugins))
         else:
             if enabled:
-                self._enabled_user_plugins.add(pid)
+                self._enabled_plugins.add(pid)
             else:
-                self._enabled_user_plugins.discard(pid)
-            self.set_default(PreferenceNames.EnabledUserPlugins, list(self._enabled_user_plugins))
+                self._enabled_plugins.discard(pid)
+            self.set_default(PreferenceNames.EnabledUserPlugins, list(self._enabled_plugins))
 
     def get_default(self, key, fallback_value=None):
         """Returns moneyGuru user pref for ``key``.

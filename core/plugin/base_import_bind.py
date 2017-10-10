@@ -9,6 +9,7 @@ from core.plugin import ImportBindPlugin, EntryMatch
 class ReferenceBind(ImportBindPlugin):
     NAME = "Reference Import Bind"
     AUTHOR = "Nelson Brown"
+    ENABLED_BY_DEFAULT = True
 
     def match_entries(self,
                       target_account,

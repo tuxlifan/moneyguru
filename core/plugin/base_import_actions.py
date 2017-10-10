@@ -10,6 +10,7 @@ from core.plugin import ImportActionPlugin
 
 class BaseSwapFields(ImportActionPlugin):
     AUTHOR = "Nelson Brown"
+    ENABLED_BY_DEFAULT = True
 
     def __init__(self):
         ImportActionPlugin.__init__(self)
@@ -142,6 +143,7 @@ class InvertAmountsPlugin(ImportActionPlugin):
     AUTHOR = "Nelson Brown"
     ACTION_NAME = tr("Invert Amount")
     PRIORITY = 5
+    ENABLED_BY_DEFAULT = True
 
     def perform_action(self, import_document, transactions, panes, selected_rows=None):
         for transaction in transactions:

@@ -15,6 +15,7 @@ from core.plugin import CurrencyProviderPlugin
 class BOCProviderPlugin(CurrencyProviderPlugin):
     NAME = 'Bank of Canada currency rates fetcher'
     AUTHOR = "Virgil Dupras"
+    ENABLED_BY_DEFAULT = True
 
     def register_currencies(self):
         self.supported_currency_codes |= {'USD', 'EUR'} # already added

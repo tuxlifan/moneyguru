@@ -15,6 +15,7 @@ from core.plugin import CurrencyProviderPlugin
 class StaleProviderPlugin(CurrencyProviderPlugin):
     NAME = 'Stale currencies provider'
     AUTHOR = "Virgil Dupras"
+    ENABLED_BY_DEFAULT = True
 
     def register_currencies(self):
         self.register_currency(
