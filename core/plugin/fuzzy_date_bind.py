@@ -8,6 +8,8 @@
 # Adapted from base_import_bind.py
 
 import datetime
+from itertools import product, starmap
+import logging
 
 from core.plugin import ImportBindPlugin, EntryMatch
 
@@ -25,8 +27,8 @@ class FuzzyDateBind(ImportBindPlugin):
     NAME = "Fuzzy Date Bind Plugin"
     AUTHOR = "Georg Drees"
 
+    BASE_CONFIDENCE = 0.75  # could be increased when implement memo matching / associations...
     DELTA_T = datetime.timedelta(4)  # 4 days
-    CONFIDENCE = 0.75  # could be increased when implement memo matching / associations...
 
     def match_entries(self,
                       target_account,
@@ -37,19 +39,15 @@ class FuzzyDateBind(ImportBindPlugin):
         matches = []
         will_import = True
 
-        for imported_entry in imported_entries:
-            lo = imported_entry.date - self.DELTA_T
-            hi = imported_entry.date + self.DELTA_T
-            for existing_entry in existing_entries:
-                if lo <= existing_entry.date and hi >= existing_entry.date:
-                    for isplit in imported_entry.splits:
-                        for esplit in existing_entry.splits:
-                            if isplit.amount == esplit.amount:
-                                matches.append(EntryMatch(existing_entry, imported_entry, will_import, self.CONFIDENCE))
-                                break
-                        # ------|
-                        else:
-                            continue
-                        break  # break on inner break to get to next existing_entry
-            # ......#---|
+        entry_pairs = [(i, e) for i, e in product(imported_entries, existing_entries)
+                       if abs(i.date - e.date) <= self.DELTA_T]
+
+        for imported_entry, existing_entry in entry_pairs:
+            if any(starmap(lambda isplit, esplit: isplit.amount == esplit.amount,
+                           product(imported_entry.splits, existing_entry.splits))):
+                confidence = self.BASE_CONFIDENCE
+                logging.debug("Fuzzy Date Bind match ({0:1.2}): {1} {2}".format(confidence, imported_entry, existing_entry))  # noqa: E501
+                # Use "existing, imported" order according to EntryMatch definition
+                matches.append(EntryMatch(existing_entry, imported_entry, will_import, confidence))
+
         return matches
