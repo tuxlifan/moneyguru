@@ -138,11 +138,11 @@ class Loader:
                     datetime.datetime.strptime(str_date, format)
                     found_at_least_one = True
                 except ValueError:
-                    logging.debug("Failed try to read the date {0} with the format {1}".format(str_date, format))
+                    logging.debug("Failed try to read the date %s with the format %s", str_date, format)
                     break
             else:
                 if found_at_least_one:
-                    logging.debug("Correct date format: {0}".format(format))
+                    logging.debug("Correct date format: %s", format)
                     return format
         return None
 
