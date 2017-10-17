@@ -31,15 +31,22 @@ class FuzzyDateBind(ImportBindPlugin):
     DELTA_T = datetime.timedelta(4)  # 4 days
     # positive key: imported is after existing
     # (e.g. money taken from account (import) after purchase date (manual entry, existing))
-    PENALTIES = {-4: .08,
-                 -3: .07,
-                 -2: .06,
-                 -1: .05,
+    PENALTIES = {-7: .13,
+                 -6: .12,
+                 -5: .11,
+                 -4: .10,
+                 -3: .09,
+                 -2: .08,
+                 -1: .07,
                  0: 0,
                  +1: .01,
                  +2: .02,
                  +3: .03,
-                 +4: .04, }
+                 +4: .04,
+                 +5: .05,
+                 +6: .06,
+                 +7: .07,
+                 }
 
     def match_entries(self,
                       target_account,
