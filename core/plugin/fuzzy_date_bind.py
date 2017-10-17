@@ -64,8 +64,9 @@ class FuzzyDateBind(ImportBindPlugin):
             if any(isplit.amount == esplit.amount
                    for isplit, esplit in product(imported_entry.splits, existing_entry.splits)):
                 confidence = self.BASE_CONFIDENCE - self.PENALTIES[(imported_entry.date - existing_entry.date).days]
-                logging.debug("Fuzzy Date Bind match (%1.2f): %s %s", confidence, imported_entry, existing_entry)
+                logging.debug("Fuzzy Date date range match (%1.3f): %s %s", confidence, imported_entry, existing_entry)
                 # Use "existing, imported" order according to EntryMatch definition
+                logging.debug("Fuzzy Date final confidence: %.3f", min(confidence, 1.00))
                 matches.append(EntryMatch(existing_entry, imported_entry, will_import, min(confidence, 1.00)))
 
         return matches
