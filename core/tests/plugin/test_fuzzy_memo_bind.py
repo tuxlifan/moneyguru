@@ -5,7 +5,7 @@
 # http://www.gnu.org/licenses/gpl-3.0.html
 
 import logging
-from hscommon.testutil import eq_sorted_
+from hscommon.testutil import eq_sorted
 
 from ...plugin.fuzzy_memo_bind import DateExtractor
 
@@ -25,7 +25,7 @@ class TestDateExtractor:
                       '30.12.',
                       '15.11.', '12/12', '6/18/68']
         result = DateExtractor(test_memo).get_tokens()
-        eq_sorted_(result, test_dates)
+        eq_sorted(result, test_dates)
 
     def test_known_bug_n_of_m(self):
         # Demonstrate that e.g. 'page 1/42' would trigger extraction.
@@ -33,7 +33,7 @@ class TestDateExtractor:
         test_memo = "This is page 1/2, see also other p. 1/42"
         test_dates = ['1/2', '1/42']
         result = DateExtractor(test_memo).get_tokens()
-        eq_sorted_(result, test_dates)
+        eq_sorted(result, test_dates)
 
     def test_language_dicts_loading(self):
         memo = 'November from 11/1'
@@ -41,13 +41,13 @@ class TestDateExtractor:
         expected_numeric_and_tokens = ['November', 'Nov', '11/1']
         # Using lang=False to disable language specific matching until user preferences are implemented
         # c.f. fuzzy_memo_bind.py: DateExtractor.__init__
-        eq_sorted_(DateExtractor(memo, lang=False).get_tokens(), expected_numeric)
-        eq_sorted_(DateExtractor(memo, lang="some_unknown_language").get_tokens(), expected_numeric)
-        eq_sorted_(DateExtractor(memo, lang="en").get_tokens(), expected_numeric_and_tokens)
+        eq_sorted(DateExtractor(memo, lang=False).get_tokens(), expected_numeric)
+        eq_sorted(DateExtractor(memo, lang="some_unknown_language").get_tokens(), expected_numeric)
+        eq_sorted(DateExtractor(memo, lang="en").get_tokens(), expected_numeric_and_tokens)
 
     def test_language_ignorecase(self):
         memo = 'november'
         expected_casesense = []
         expected_ignorecase = ['November', 'Nov']
-        eq_sorted_(DateExtractor(memo, lang="en", ignorecase=False).get_tokens(), expected_casesense)
-        eq_sorted_(DateExtractor(memo, lang="en", ignorecase=True).get_tokens(), expected_ignorecase)
+        eq_sorted(DateExtractor(memo, lang="en", ignorecase=False).get_tokens(), expected_casesense)
+        eq_sorted(DateExtractor(memo, lang="en", ignorecase=True).get_tokens(), expected_ignorecase)
