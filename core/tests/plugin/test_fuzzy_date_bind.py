@@ -70,8 +70,8 @@ def test_single_imported_typical(do_refine_matches):
     imported_entries = list(starmap(create_entry, [
         (DATE + timedelta(1), 'i1', 42),
     ]))
-    matches = plugin.match_entries(None, None, None, existing_entries, imported_entries,
-                                   do_refine_matches=do_refine_matches)
+    matches = plugin.match_entries(None, None, None, existing_entries, imported_entries)  # ,
+                                   #do_refine_matches=do_refine_matches)  # noqa TODO re-enable when FuzzyMemoBind re-added
     EXPECTED = [('e1', 'i1', True, BASE_CONFIDENCE - PENALTIES[1]),
                 ('e2', 'i1', True, BASE_CONFIDENCE - PENALTIES[-1])]
     result = [(m.existing.description, m.imported.description, m.will_import, m.weight) for m in matches]
@@ -90,8 +90,8 @@ def test_outside_date_intervall(do_refine_matches):
     imported_entries = list(starmap(create_entry, [
         (DATE, 'i1', 42),
     ]))
-    matches = plugin.match_entries(None, None, None, existing_entries, imported_entries,
-                                   do_refine_matches=do_refine_matches)
+    matches = plugin.match_entries(None, None, None, existing_entries, imported_entries)  # ,
+                                   #do_refine_matches=do_refine_matches)  # noqa TODO re-enable when FuzzyMemoBind re-added
     result = [(m.existing.description, m.imported.description, m.will_import, m.weight) for m in matches]
     eq_(len(result), 0)
 
@@ -114,8 +114,8 @@ def test_match_for_each_existing_in_range(do_refine_matches):
     imported_entries = list(starmap(create_entry, [
         (DATE, 'i1', 42),
     ]))
-    matches = plugin.match_entries(None, None, None, existing_entries, imported_entries,
-                                   do_refine_matches=do_refine_matches)
+    matches = plugin.match_entries(None, None, None, existing_entries, imported_entries)  # ,
+                                   #do_refine_matches=do_refine_matches)  # noqa TODO re-enable when FuzzyMemoBind re-added
     result = [(m.existing.description, m.imported.description, m.will_import, m.weight) for m in matches]
     eq_(len(result), num)
     for r in result:
@@ -123,76 +123,78 @@ def test_match_for_each_existing_in_range(do_refine_matches):
         eq_(r[1], 'i1')
 
 
-def test_second_imported_matches_numeric_date():
-    # If two txns on the correct day with same amount are imported, the one with
-    # better matching description should get a higher weight, even if second in list
-    plugin = FuzzyDateBind()
-    DATE = date(2017, 10, 10)
-    e1 = 'e1 2017-10-10'
-    existing_entries = list(starmap(create_entry, [
-        (DATE, e1, 42),
-    ]))
-    i1 = 'i1'
-    i2 = 'i2 2017-10-10'
-    imported_entries = list(starmap(create_entry, [
-        (DATE, i1, 42),
-        (DATE, i2, 42),
-    ]))
-    matches = plugin.match_entries(None, None, None, existing_entries, imported_entries,
-                                   do_refine_matches=True)
-    EXPECTED = [(e1, i1, True, BASE_CONFIDENCE),
-                (e1, i2, True, min(BASE_CONFIDENCE + FuzzyDateBind.CONF_PER_MEMODATE_MATCH, 1.00))]
-    result = [(m.existing.description, m.imported.description, m.will_import, m.weight) for m in matches]
-    eq_(result, EXPECTED)
-    assert(EXPECTED[0][-1] < EXPECTED[1][-1])
-
-
-def test_multi_refined_numeric_date():
-    # Verify that refined matching can find more than one match
-    plugin = FuzzyDateBind()
-    DATE = date(2017, 10, 10)
-    e1 = 'e1 for 2017-01-01 until 2017-09-30'
-    existing_entries = list(starmap(create_entry, [
-        (DATE, e1, 42),
-    ]))
-    i1 = 'i1 2017-01-01-2017-09-30'
-    i2 = 'i2 2017-01-01, 2017-09-30 and 2017-01-01 again'
-    imported_entries = list(starmap(create_entry, [
-        (DATE, i1, 42),
-        (DATE, i2, 42),
-    ]))
-    matches = plugin.match_entries(None, None, None, existing_entries, imported_entries,
-                                   do_refine_matches=True)
-    EXPECTED = [(e1, i1, True, min(BASE_CONFIDENCE + 2 * FuzzyDateBind.CONF_PER_MEMODATE_MATCH, 1.00)),
-                # ['2017-01-01', '2017-09-30']  # noqa: E116
-                (e1, i2, True, min(BASE_CONFIDENCE + 3 * FuzzyDateBind.CONF_PER_MEMODATE_MATCH, 1.00))]
-                # ['2017-01-01', '2017-09-30', '2017-01-01']  # noqa: E116
-    result = [(m.existing.description, m.imported.description, m.will_import, m.weight) for m in matches]
-    eq_(result, EXPECTED)
-
-
-def test_multi_refined_numeric_and_en_date():
-    # Verify that refined matching with language adds weight
-    plugin = FuzzyDateBind()
-    DATE = date(2017, 10, 10)
-    e1 = 'e1 for 2017-01-01 and February'
-    existing_entries = list(starmap(create_entry, [
-        (DATE, e1, 42),
-    ]))
-    i1 = 'i1 2017-01-01-2017-09-30'
-    i2 = 'i2 2017-01-01, 2017-09-30 + February'
-    imported_entries = list(starmap(create_entry, [
-        (DATE, i1, 42),
-        (DATE, i2, 42),
-    ]))
-    matches = plugin.match_entries(None, None, None, existing_entries, imported_entries,
-                                   do_refine_matches=True, lang="en")
-    EXPECTED = [(e1, i1, True, min(BASE_CONFIDENCE + 1 * FuzzyDateBind.CONF_PER_MEMODATE_MATCH, 1.00)),
-                # ['2017-01-01']  # noqa: E116
-                (e1, i2, True, min(BASE_CONFIDENCE + 3 * FuzzyDateBind.CONF_PER_MEMODATE_MATCH, 1.00))]
-                # ['2017-01-01', 'February', 'Feb']  # noqa: E116
-    result = [(m.existing.description, m.imported.description, m.will_import, m.weight) for m in matches]
-    eq_(result, EXPECTED)
+# ## Disabled until FuzzyMemoBind re-added
+#
+# def test_second_imported_matches_numeric_date():
+#     # If two txns on the correct day with same amount are imported, the one with
+#     # better matching description should get a higher weight, even if second in list
+#     plugin = FuzzyDateBind()
+#     DATE = date(2017, 10, 10)
+#     e1 = 'e1 2017-10-10'
+#     existing_entries = list(starmap(create_entry, [
+#         (DATE, e1, 42),
+#     ]))
+#     i1 = 'i1'
+#     i2 = 'i2 2017-10-10'
+#     imported_entries = list(starmap(create_entry, [
+#         (DATE, i1, 42),
+#         (DATE, i2, 42),
+#     ]))
+#     matches = plugin.match_entries(None, None, None, existing_entries, imported_entries,
+#                                    do_refine_matches=True)
+#     EXPECTED = [(e1, i1, True, BASE_CONFIDENCE),
+#                 (e1, i2, True, min(BASE_CONFIDENCE + FuzzyDateBind.CONF_PER_MEMODATE_MATCH, 1.00))]
+#     result = [(m.existing.description, m.imported.description, m.will_import, m.weight) for m in matches]
+#     eq_(result, EXPECTED)
+#     assert(EXPECTED[0][-1] < EXPECTED[1][-1])
+#
+#
+# def test_multi_refined_numeric_date():
+#     # Verify that refined matching can find more than one match
+#     plugin = FuzzyDateBind()
+#     DATE = date(2017, 10, 10)
+#     e1 = 'e1 for 2017-01-01 until 2017-09-30'
+#     existing_entries = list(starmap(create_entry, [
+#         (DATE, e1, 42),
+#     ]))
+#     i1 = 'i1 2017-01-01-2017-09-30'
+#     i2 = 'i2 2017-01-01, 2017-09-30 and 2017-01-01 again'
+#     imported_entries = list(starmap(create_entry, [
+#         (DATE, i1, 42),
+#         (DATE, i2, 42),
+#     ]))
+#     matches = plugin.match_entries(None, None, None, existing_entries, imported_entries,
+#                                    do_refine_matches=True)
+#     EXPECTED = [(e1, i1, True, min(BASE_CONFIDENCE + 2 * FuzzyDateBind.CONF_PER_MEMODATE_MATCH, 1.00)),
+#                 # ['2017-01-01', '2017-09-30']  # noqa: E116
+#                 (e1, i2, True, min(BASE_CONFIDENCE + 3 * FuzzyDateBind.CONF_PER_MEMODATE_MATCH, 1.00))]
+#                 # ['2017-01-01', '2017-09-30', '2017-01-01']  # noqa: E116
+#     result = [(m.existing.description, m.imported.description, m.will_import, m.weight) for m in matches]
+#     eq_(result, EXPECTED)
+#
+#
+# def test_multi_refined_numeric_and_en_date():
+#     # Verify that refined matching with language adds weight
+#     plugin = FuzzyDateBind()
+#     DATE = date(2017, 10, 10)
+#     e1 = 'e1 for 2017-01-01 and February'
+#     existing_entries = list(starmap(create_entry, [
+#         (DATE, e1, 42),
+#     ]))
+#     i1 = 'i1 2017-01-01-2017-09-30'
+#     i2 = 'i2 2017-01-01, 2017-09-30 + February'
+#     imported_entries = list(starmap(create_entry, [
+#         (DATE, i1, 42),
+#         (DATE, i2, 42),
+#     ]))
+#     matches = plugin.match_entries(None, None, None, existing_entries, imported_entries,
+#                                    do_refine_matches=True, lang="en")
+#     EXPECTED = [(e1, i1, True, min(BASE_CONFIDENCE + 1 * FuzzyDateBind.CONF_PER_MEMODATE_MATCH, 1.00)),
+#                 # ['2017-01-01']  # noqa: E116
+#                 (e1, i2, True, min(BASE_CONFIDENCE + 3 * FuzzyDateBind.CONF_PER_MEMODATE_MATCH, 1.00))]
+#                 # ['2017-01-01', 'February', 'Feb']  # noqa: E116
+#     result = [(m.existing.description, m.imported.description, m.will_import, m.weight) for m in matches]
+#     eq_(result, EXPECTED)
 
 
 @mark.xfail(reason="Python does not guarantee unix epoch safety, it depends on system C library.")
@@ -221,8 +223,8 @@ def test_unix_epoch(do_refine_matches):
         (date(2106, 2, 8), 'i3', 33),
         (date(2106, 2, 6), 'i4', 44),
     ]))
-    matches = plugin.match_entries(None, None, None, existing_entries, imported_entries,
-                                   do_refine_matches=do_refine_matches)
+    matches = plugin.match_entries(None, None, None, existing_entries, imported_entries)  # ,
+                                   #do_refine_matches=do_refine_matches)  # noqa TODO re-enable when FuzzyMemoBind re-added
     EXPECTED = [('e1', 'i1', True, BASE_CONFIDENCE - PENALTIES[2]),
                 ('e2', 'i2', True, BASE_CONFIDENCE - PENALTIES[-2]),
                 ('e3', 'i3', True, BASE_CONFIDENCE - PENALTIES[2]),
