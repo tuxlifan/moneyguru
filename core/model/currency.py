@@ -1,6 +1,4 @@
-# Created By: Virgil Dupras
-# Created On: 2008-04-20
-# Copyright 2015 Hardcoded Software (http://www.hardcoded.net)
+# Copyright 2017 Virgil Dupras
 
 # This software is licensed under the "GPLv3" License as described in the "LICENSE" file,
 # which should be included with this package. The terms are also available at
@@ -364,6 +362,8 @@ class RatesDB:
                 else:
                     logging.debug("Fetching failed!")
 
+        if start_date >= date.today():
+            return # we never return rates in the future
         currencies_and_range = []
         for currency in currencies:
             if currency == 'CAD':

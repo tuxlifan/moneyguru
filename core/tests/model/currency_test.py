@@ -1,6 +1,4 @@
-# Created By: Virgil Dupras
-# Created On: 2008-05-22
-# Copyright 2015 Hardcoded Software (http://www.hardcoded.net)
+# Copyright 2017 Virgil Dupras
 #
 # This software is licensed under the "GPLv3" License as described in the "LICENSE" file,
 # which should be included with this package. The terms are also available at
@@ -95,6 +93,16 @@ def test_dont_crash_on_None_rates():
     db, log = set_ratedb_for_tests(provider=provider)
     db.ensure_rates(date(2008, 5, 20), ['USD']) # no crash
     db.get_rate(date(2008, 5, 20), 'USD', 'CAD') # no crash
+
+def test_dont_cache_requests_in_the_future():
+    # See issue #497
+    # When receiving requests for rates in the future, we should shortcut our logic and completely
+    # ignore the request. Previously, we would cache the request and, sometimes (in rare occasions)
+    # we would get a request for datetime.max. Because this ended up in our cache and that datetime
+    # arithmetic was performed on it, we would end up with an OverflowError. Avoid this.
+    db, log = set_ratedb_for_tests()
+    db.ensure_rates(date.max, ['USD'])
+    db.ensure_rates(date(2017, 11, 4), ['USD']) # no crash
 
 # --- Test for the default XMLRPC provider
 def exception_raiser(exception):
