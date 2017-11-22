@@ -13,7 +13,6 @@
 from datetime import date, timedelta
 from itertools import starmap
 from random import randint
-import logging
 
 from pytest import mark, raises
 
@@ -27,8 +26,6 @@ from ...plugin.fuzzy_date_bind import FuzzyDateBind
 
 BASE_CONFIDENCE = FuzzyDateBind.BASE_CONFIDENCE
 PENALTIES = FuzzyDateBind.PENALTIES
-
-logging.basicConfig(level=logging.DEBUG)
 
 
 def create_entry(entry_date, description, amount):
