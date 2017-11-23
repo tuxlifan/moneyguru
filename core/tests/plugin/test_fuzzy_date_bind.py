@@ -115,8 +115,6 @@ def test_match_for_each_existing_in_range():
 
 
 @mark.xfail(reason="Python does not guarantee unix epoch safety, it depends on system C library.")
-@mark.skipif(FuzzyDateBind.DELTA_T.days < 2,
-             reason="Need FuzzyDateBind.DELTA_T >= 2 to test due to static special dates.")
 def test_unix_epoch():
     # Test using specific dates that could be problematic when the unix time
     # with 32 bit representation overflows. c.f. https://en.wikipedia.org/wiki/Unix_time
@@ -126,23 +124,7 @@ def test_unix_epoch():
     # NOTE:
     # Currently python depends on your system's C library for date functionality
     # during unix epoch change to work correctly.
-    plugin = FuzzyDateBind()
-    existing_entries = list(starmap(create_entry, [
-        (date(2038, 1, 18), 'e1', 11),
-        (date(2038, 1, 20), 'e2', 22),
-        (date(2106, 2, 6), 'e3', 33),
-        (date(2106, 2, 8), 'e4', 44),
-    ]))
-    imported_entries = list(starmap(create_entry, [
-        (date(2038, 1, 20), 'i1', 11),
-        (date(2038, 1, 18), 'i2', 22),
-        (date(2106, 2, 8), 'i3', 33),
-        (date(2106, 2, 6), 'i4', 44),
-    ]))
-    matches = plugin.match_entries(None, None, None, existing_entries, imported_entries)
-    EXPECTED = [('e1', 'i1', True, BASE_CONFIDENCE - PENALTIES[2]),
-                ('e2', 'i2', True, BASE_CONFIDENCE - PENALTIES[-2]),
-                ('e3', 'i3', True, BASE_CONFIDENCE - PENALTIES[2]),
-                ('e4', 'i4', True, BASE_CONFIDENCE - PENALTIES[-2])]
-    result = [(m.existing.description, m.imported.description, m.will_import, m.weight) for m in matches]
-    eq_(result, EXPECTED)
+    eq_((date(2038, 1, 20) - date(2038, 1, 18)).days, 2)
+    eq_((date(2038, 1, 18) - date(2038, 1, 20)).days, -2)
+    eq_((date(2106, 2, 8) - date(2106, 2, 6)).days, 2)
+    eq_((date(2106, 2, 6) - date(2106, 2, 8)).days, -2)
