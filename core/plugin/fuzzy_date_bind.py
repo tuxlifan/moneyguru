@@ -28,7 +28,9 @@ class FuzzyDateBind(ImportBindPlugin):
     AUTHOR = "Georg Drees"
 
     BASE_CONFIDENCE = 0.75  # could be increased when implement memo matching / associations...
-    DELTA_T = datetime.timedelta(4)  # 4 days
+    DELTA_T = datetime.timedelta(4)  # 4 days; you must extend PENALTIES if DELTA_T > 7 days or a KeyError could occur!
+    # PENALTIES must have keys for all integers in the inclusive range [ -DELTA_T.days; +DELTA_T.days ]
+    # to avoid a KeyError on lookup.
     # positive key: imported is after existing
     # (e.g. money taken from account (import) after purchase date (manual entry, existing))
     PENALTIES = {-7: .13,
