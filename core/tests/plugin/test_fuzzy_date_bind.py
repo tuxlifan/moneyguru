@@ -92,26 +92,26 @@ def test_outside_date_intervall():
 def test_match_for_each_existing_in_range():
     # Verify a match is created for each existing in the date range
     plugin = FuzzyDateBind()
-    num = randint(1, 50)  # to limit the runtime of the test
     DATE = date(2017, 10, 10)
-    existing_entries = list(starmap(create_entry, [
-        (DATE - FuzzyDateBind.DELTA_T - timedelta(1), 'e1out', 42),
-        (DATE + FuzzyDateBind.DELTA_T + timedelta(1), 'e2out', 42),
-    ]))
-    for i in range(num):
-        existing_entries.append(create_entry(DATE + timedelta(randint(-FuzzyDateBind.DELTA_T.days,
-                                                                      +FuzzyDateBind.DELTA_T.days)),
-                                             'random entry',
-                                             42))
-    imported_entries = list(starmap(create_entry, [
-        (DATE, 'i1', 42),
-    ]))
-    matches = plugin.match_entries(None, None, None, existing_entries, imported_entries)
-    result = [(m.existing.description, m.imported.description, m.will_import, m.weight) for m in matches]
-    eq_(len(result), num)
-    for r in result:
-        eq_(r[0], 'random entry')
-        eq_(r[1], 'i1')
+    for num in [0, 1, 2, randint(3, 50)]:  # TODO: Use fuzzer. Arbitrarily limited to limit the test runtime
+        existing_entries = list(starmap(create_entry, [
+            (DATE - FuzzyDateBind.DELTA_T - timedelta(1), 'e1out', 42),
+            (DATE + FuzzyDateBind.DELTA_T + timedelta(1), 'e2out', 42),
+        ]))
+        for i in range(num):
+            existing_entries.append(create_entry(DATE + timedelta(randint(-FuzzyDateBind.DELTA_T.days,
+                                                                          +FuzzyDateBind.DELTA_T.days)),
+                                                 'random entry',
+                                                 42))
+        imported_entries = list(starmap(create_entry, [
+            (DATE, 'i1', 42),
+        ]))
+        matches = plugin.match_entries(None, None, None, existing_entries, imported_entries)
+        result = [(m.existing.description, m.imported.description, m.will_import, m.weight) for m in matches]
+        eq_(len(result), num)
+        for r in result:
+            eq_(r[0], 'random entry')
+            eq_(r[1], 'i1')
 
 
 @mark.xfail(reason="Python does not guarantee unix epoch safety, it depends on system C library.")
