@@ -16,7 +16,6 @@ def test_boc_currency_provider_EUR():
     provider = BOCProviderPlugin()
     rates = provider.get_currency_rates('EUR', date(2017, 8, 6), date(2017, 8, 12))
     EXPECTED = [
-        (date(2017, 8, 7), None), # Holiday monday
         (date(2017, 8, 8), 1.4911),
         (date(2017, 8, 9), 1.4916),
         (date(2017, 8, 10), 1.4936),
