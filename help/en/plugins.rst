@@ -2,11 +2,14 @@ Plugins
 =======
 
 Since moneyGuru v2.5, it's possible to expand moneyGuru's capability through Python plugins. Plugins
-are Python 3 source files that come in two flavors: "core" and "user. Core plugins are bundled
-directly in moneyGuru and are enabled by default. User plugins are located in the plugin folder (the
-location of that folder depends on the system, but you can open that folder through
-"File --> Open Plugin Folder") and are disabled by default. To install a new user plugin, you can
-simply copy the python source file of that plugin in that folder and restart moneyGuru.
+are Python 3 source files that come in two flavors: "core" and "user".
+
+Core plugins are bundled directly in moneyGuru and most of them are enabled by default, with the exceptions listed below.
+
+User plugins are located in the plugin folder (the location of that folder depends on the system,
+but you can open that folder through "File --> Open Plugin Folder") and are disabled by default.
+To install a new user plugin, you can simply copy the python source file of that plugin in that
+folder and restart moneyGuru.
 
 You can enable and disable plugins through the "Plugin management" view, available whenever you
 open a new tab. Simply check/uncheck the box next to the plugin you want to enable/disable and
@@ -49,6 +52,32 @@ Import match bindings are plugins that allow us to re-define the way we do autom
 importing transactions in an existing account. For now, we only have one core plugin of this type
 that match transactions based on IDs supplied by the OFX format. If you add a plugin of that type,
 additional criterias will be used for matching (for example, you could match based on date+amount).
+
+Core plugins that are not enabled by default
+--------------------------------------------
+
+You can enable any core plugin that is not enabled by default in the same way as you would enable
+a user plugin in the "Plugin management" view as described above on this page.
+
+Fuzzy Date Bind Plugin
+^^^^^^^^^^^^^^^^^^^^^^
+With the ``Fuzzy Date Bind Plugin`` you can let moneyGuru match transactions whose dates are not exactly
+the same but within a certain date range (up to 4 days earlier or later) during import. For a match to
+occurr also at least one amount in the splits of the compared transactions must have the same value.
+
+To help match the most logical pairs the following heuristic is used:
+    * a match with exactly the *same dates* has the highest weight
+    * existing transactions with a date *earlier* than the imported transaction are preferred after that,
+      with a higher weight the closer the dates match.
+    * existing transactions with a date *later* than the imported transaction have the lowest weights
+      which are even more decreased for more distant dates.
+
+Therefore matches with the same dates are matched as they would have been without this plugin and
+the common case of an account withdrawal ('imported' transaction; with e.g. the monthly statement)
+being recorded with a date a few days after the purchase ('existing' transaction, entered e.g. with
+a manual entry) should also be matched automatically.
+
+This plugin is not enabled by default to prevent unexpected behavior.
 
 Creating a plugin
 -----------------

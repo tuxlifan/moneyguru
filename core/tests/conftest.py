@@ -9,11 +9,14 @@
 import os
 import time
 import pytest
+import logging
 
 from hscommon.testutil import pytest_funcarg__app # noqa
 
 from ..model.currency import RatesDB, Currency
 from ..model import currency as currency_module
+
+logging.basicConfig(level=logging.DEBUG)
 
 global_monkeypatch = None
 

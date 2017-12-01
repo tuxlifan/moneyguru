@@ -27,6 +27,7 @@ def get_all_core_plugin_modules():
         account_list, currency_rates, payee_breakdown, boc_currency_provider,
         yahoo_currency_provider, stale_currency_provider,
         base_import_actions, base_import_bind,
+        fuzzy_date_bind,
     )
     return [
         account_list,
@@ -37,5 +38,6 @@ def get_all_core_plugin_modules():
         stale_currency_provider,
         base_import_actions,
         base_import_bind,
+        fuzzy_date_bind,
     ]
 
