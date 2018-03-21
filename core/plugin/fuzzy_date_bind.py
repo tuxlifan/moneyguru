@@ -16,7 +16,8 @@ from core.plugin import ImportBindPlugin, EntryMatch
 #
 # TODO: possible error source: date range selected for moneyguru.
 #
-#       Does it influence existing_entries below? Are there older entries that don't appear?
+#       https://github.com/hsoft/moneyguru/pull/496#discussion_r147543652:
+#       Currently (2017-10-28) existing_entries are filled via Document's Oven, therefore bounded by the date range.
 #
 
 
